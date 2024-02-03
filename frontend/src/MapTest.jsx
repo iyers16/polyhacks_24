@@ -49,6 +49,8 @@ export default function MapTest() {
         fetchPlaces(map, maps, placeType);
     });
 
+    
+
     const fetchPlaces = (map, maps, type, nextPageToken = null, pagesLeft = 4, allResults = []) => {
         const service = new maps.places.PlacesService(map);
         const request = nextPageToken ?
