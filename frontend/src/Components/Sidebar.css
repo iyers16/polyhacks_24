@@ -1,0 +1,122 @@
+/* Sidebar styles */
+.sidebar {
+    width: 250px;
+    background: #A4D4AE; /* Light green background from the image */
+    color: #3A6351; /* Dark green color for text from the image */
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Dropdown button styles */
+  .dropdown {
+    background-color: #75B79E; /* Medium green background from the image */
+    color: #3A6351;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown:hover,
+  .dropdown:focus {
+    background-color: #3A6351; /* Dark green color for hover/focus from the image */
+    color: #A4D4AE;
+  }
+  
+  /* Dropdown content styles */
+  .dropdown-content {
+    display: none;
+    background-color: #A4D4AE; /* Light green background for dropdown content */
+    padding: 10px;
+    border-left: 4px solid #75B79E; /* Medium green border from the image */
+  }
+  
+  /* Show dropdown content */
+  .show {
+    display: block;
+  }
+  
+  /* Filter option styles */
+  .filter-option {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  
+  .filter-option input[type="checkbox"] {
+    margin-right: 10px;
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    appearance: none; /* Remove default checkbox appearance */
+  }
+  
+  .filter-option label {
+    position: relative;
+    padding-left: 25px;
+  }
+  
+  /* Custom checkbox styles */
+  .filter-option label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #3A6351; /* Dark green border from the image */
+    border-radius: 3px;
+    background-color: transparent;
+  }
+  
+  /* Style for checked state */
+  .filter-option input:checked ~ label:before {
+    background-color: #75B79E; /* Medium green background for checked state */
+  }
+  
+  /* Checkmark style */
+  .filter-option label:after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid #3A6351; /* Dark green checkmark from the image */
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+    display: none;
+  }
+  
+  /* Display checkmark when checked */
+  .filter-option input:checked ~ label:after {
+    display: block;
+  }
+  
+  /* Header styles */
+  .sidebar h2 {
+    color: #75B79E; /* Medium green color for headers from the image */
+  }
+  
+  /* New button to toggle sidebar visibility */
+  .sidebar-toggle {
+    position: fixed;
+    top: 10px; /* Adjust as needed */
+    left: 10px; /* Adjust as needed */
+    z-index: 100; /* Ensure it's above other content */
+    padding: 8px 12px;
+    background: #75B79E; /* Medium green background */
+    color: #3A6351; /* Dark green text */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Style to hide the sidebar */
+  .hidden {
+    display: none;
+  }
+  
