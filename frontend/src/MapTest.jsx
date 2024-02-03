@@ -12,21 +12,23 @@ export default function MapTest() {
             lat: 45.501690,
             lng: -73.567253
         },
-        zoom: 11
+        zoom: 15
     };
 
-    const placeTypes = ['provigo']; // Add more place types as needed
+    const placeTypes = ['stadium']; // Add more place types as needed
 
     const fetchPlaces = (map, maps, type) => {
         const service = new maps.places.PlacesService(map);
         const request = {
             location: new maps.LatLng(defaultProps.center.lat, defaultProps.center.lng),
-            radius: '5000', // Adjust based on the desired radius
-            type: [type]
+            radius: '30000', // Adjust based on the desired radius
+            type: placeTypes
         };
 
         service.nearbySearch(request, (results, status) => {
             if (status === maps.places.PlacesServiceStatus.OK) {
+                console.log(results);
+
                 console.log(`Found ${results.length} ${type}(s).`);
                 createHeatmapLayer(map, maps, results);
             } else {
@@ -46,7 +48,7 @@ export default function MapTest() {
         new maps.visualization.HeatmapLayer({
             data: heatmapData,
             map: map,
-            radius: 20 // Adjust radius as needed
+            radius: 25 // Adjust radius as needed
         });
     };
 
