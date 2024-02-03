@@ -1,5 +1,5 @@
 import GoogleMapReact from 'google-map-react';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
@@ -18,15 +18,15 @@ export default function MapTest() {
 
 
     const placeTypes = [
-         'atm', 'bank', 'bar', 
-         'book_store',  'bus_station', 'cafe', 
-         'clothing_store', 'convenience_store',
-       'drugstore', 
+        'atm', 'bank', 'bar',
+        'book_store', 'bus_station', 'cafe',
+        'clothing_store', 'convenience_store',
+        'drugstore',
         'gym',
         'hospital', 'laundry', 'library',
-        'lodging','park', 
-         'pharmacy', 'police', 'post_office', 'primary_school', 
-        'restaurant', 'school', 'secondary_school','shopping_mall',
+        'lodging', 'park',
+        'pharmacy', 'police', 'post_office', 'primary_school',
+        'restaurant', 'school', 'secondary_school', 'shopping_mall',
         'stadium', 'store', 'subway_station', 'supermarket', 'train_station', 'transit_station', 'university'
     ];
 
@@ -89,6 +89,87 @@ export default function MapTest() {
             .then(results => {
                 const placesObject = results.reduce((acc, { type, results }) => {
                     acc[type] = results;
+                    results.forEach(place => {
+                        if (type === 'drugstore' || type === 'hospital' || type === 'pharmacy') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.gstatic.com/mapfiles/ms2/micons/pink-dot.png'
+                                }
+                            });
+                        }
+                        else if (type === 'school' || type === 'primary_school' || type === 'secondary_school' || type === 'university' || type === 'library') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                                }
+                            });
+                        }
+                        else if (type === 'clothing_store' || type === 'book_store' || type === 'shopping_mall' || type === 'store' || type === 'supermarket' || type === 'convenience_store') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
+                                }
+                            });
+                        }
+                        else if (type === 'atm' || type === 'bank') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.gstatic.com/mapfiles/ms2/micons/lightblue.png'
+                                }
+                            });
+                        }
+                        else if (type === 'bus_station' || type === 'subway_station' || type === 'train_station' || type === 'transit_station') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+                                }
+                            });
+                        }
+                        else if (type === 'cafe' || type === 'restaurant' || type === 'bar') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+                                }
+                            });
+                        }
+                        else if (type === 'park' || type === 'gym' || type === 'laundry' || type === 'lodging' || type === 'police' || type === 'post_office' || type === 'stadium') {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                                icon: {
+                                    url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                                }
+                            })
+                        }
+                        else {
+                            new maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name
+                            });
+                        }
+
+
+                    });
                     return acc;
                 }, {});
 
@@ -97,7 +178,7 @@ export default function MapTest() {
             .catch(error => console.error(error));
     };
 
-   
+
     return (
         <div style={{ height: '100vh', width: '100%' }}>
             {/* Enhanced Search Bar */}
