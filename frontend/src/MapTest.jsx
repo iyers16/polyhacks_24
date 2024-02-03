@@ -13,7 +13,7 @@ export default function MapTest() {
             lat: 45.501690,
             lng: -73.567253
         },
-        zoom: 11
+        zoom: 15
     };
 
     function dumpArrayToJSON(array, filename) {
