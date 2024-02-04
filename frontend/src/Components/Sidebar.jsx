@@ -108,9 +108,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <button onClick={handleSidebarToggle} className="sidebar-toggle">
-        {isSidebarVisible ? 'Hide' : 'Show Filters'}
-      </button>
+      
       {isSidebarVisible && (
         <aside className="sidebar">
           <h2>Filters</h2>
