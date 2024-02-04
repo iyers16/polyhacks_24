@@ -17,7 +17,7 @@ Interactive Markers: Interactive markers on the map provide additional informati
 Here are the commands needed to get started:
 1. Do `cd frontend`
 
-## `npm i`
+### `npm i`
 
 ### `npm start`
 Runs the app in the development mode.\
