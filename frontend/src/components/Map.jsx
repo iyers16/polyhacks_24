@@ -1,215 +1,115 @@
 import GoogleMapReact from 'google-map-react';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-export default function Map() {
+const placeOptions = [
+    'atm', 'bank', 'bar', 'book_store', 'bus_station', 'cafe',
+    'clothing_store', 'convenience_store', 'drugstore', 'gym',
+    'hospital', 'laundry', 'library', 'lodging', 'park', 'pharmacy',
+    'police', 'post_office', 'primary_school', 'restaurant', 'school',
+    'secondary_school', 'shopping_mall', 'stadium', 'store',
+    'subway_station', 'supermarket', 'train_station', 'transit_station',
+    'university'
+].map(type => ({ value: type, label: type.replaceAll('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }));
+
+export default function MapPage() {
     const [map, setMap] = useState(null);
-    const [maps, setMaps] = useState(null);
-    const autocompleteInput = useRef(null);
+    const [mapsApi, setMapsApi] = useState(null);
+    const [checkedTypes, setCheckedTypes] = useState({});
+    const [markers, setMarkers] = useState([]);
 
-    const defaultProps = {
-        center: {
-            lat: 45.501690,
-            lng: -73.567253
-        },
-        zoom: 11
+    useEffect(() => {
+        const initialCheckedTypes = placeOptions.reduce((acc, option) => {
+            acc[option.value] = false;
+            return acc;
+        }, {});
+        setCheckedTypes(initialCheckedTypes);
+    }, []);
+
+    const handleCheckboxChange = (type) => {
+        const updatedCheckedTypes = { ...checkedTypes, [type]: !checkedTypes[type] };
+        setCheckedTypes(updatedCheckedTypes);
+
+        // Optionally, immediately update marker visibility if markers are already placed
+        updateMarkerVisibility(updatedCheckedTypes);
     };
 
-
-    const placeTypes = [
-        'atm', 'bank', 'bar',
-        'book_store', 'bus_station', 'cafe',
-        'clothing_store', 'convenience_store',
-        'drugstore',
-        'gym',
-        'hospital', 'laundry', 'library',
-        'lodging', 'park',
-        'pharmacy', 'police', 'post_office', 'primary_school',
-        'restaurant', 'school', 'secondary_school', 'shopping_mall',
-        'stadium', 'store', 'subway_station', 'supermarket', 'train_station', 'transit_station', 'university'
-    ];
-
-    const fetchPlaces = (map, maps, type) => {
-        return new Promise((resolve, reject) => {
-            let allResults = [];
-            const service = new maps.places.PlacesService(map);
-            const request = {
-                location: new maps.LatLng(defaultProps.center.lat, defaultProps.center.lng),
-                radius: '10000',
-                type: [type]
-            };
-
-            const fetch = (request, resolve, reject, count = 0) => {
-                service.nearbySearch(request, (results, status, pagination) => {
-                    if (status === maps.places.PlacesServiceStatus.OK) {
-                        allResults = allResults.concat(results);
-                        if (pagination && pagination.hasNextPage && count < 3) { // 3 because we start from 0, so 0-3 equals 4 requests
-                            pagination.nextPage();
-                            fetch(request, resolve, reject, count + 1);
-                        } else {
-                            resolve({ type, results: allResults });
-                        }
-                    } else {
-                        reject(`Failed to fetch ${type} data: ${status}`);
-                    }
-                });
-            };
-
-            fetch(request, resolve, reject);
+    const updateMarkerVisibility = (updatedCheckedTypes) => {
+        markers.forEach(marker => {
+            marker.setVisible(updatedCheckedTypes[marker.customType]);
         });
     };
 
-    const handleApiLoaded = (map, maps) => {
-        setMap(map);
-        setMaps(maps);
+    const fetchPlacesAndPlaceMarkers = (type) => {
+        if (!map || !mapsApi || !checkedTypes[type]) return;
 
-        // Initialize the Autocomplete
-        const autocomplete = new maps.places.Autocomplete(autocompleteInput.current);
-        autocomplete.bindTo('bounds', map);
+        const service = new mapsApi.places.PlacesService(map);
+        const request = {
+            location: map.getCenter(),
+            radius: '5000',
+            type: type
+        };
 
-        // Add listener for the place_changed event on autocomplete
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) {
-                console.log("Returned place contains no geometry");
-                return;
-            }
-            const bounds = new maps.LatLngBounds();
-            if (place.geometry.viewport) {
-                // Only geocodes have viewport.
-                bounds.union(place.geometry.viewport);
-            } else {
-                bounds.extend(place.geometry.location);
-            }
-            map.fitBounds(bounds);
-        });
-
-        Promise.all(placeTypes.map(type => fetchPlaces(map, maps, type)))
-            .then(results => {
-                const placesObject = results.reduce((acc, { type, results }) => {
-                    acc[type] = results;
-                    results.forEach(place => {
-                        if (type === 'drugstore' || type === 'hospital' || type === 'pharmacy') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.gstatic.com/mapfiles/ms2/micons/pink-dot.png'
-                                }
-                            });
-                        }
-                        else if (type === 'school' || type === 'primary_school' || type === 'secondary_school' || type === 'university' || type === 'library') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-                                }
-                            });
-                        }
-                        else if (type === 'clothing_store' || type === 'book_store' || type === 'shopping_mall' || type === 'store' || type === 'supermarket' || type === 'convenience_store') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
-                                }
-                            });
-                        }
-                        else if (type === 'atm' || type === 'bank') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.gstatic.com/mapfiles/ms2/micons/lightblue.png'
-                                }
-                            });
-                        }
-                        else if (type === 'bus_station' || type === 'subway_station' || type === 'train_station' || type === 'transit_station') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-                                }
-                            });
-                        }
-                        else if (type === 'cafe' || type === 'restaurant' || type === 'bar') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
-                                }
-                            });
-                        }
-                        else if (type === 'park' || type === 'gym' || type === 'laundry' || type === 'lodging' || type === 'police' || type === 'post_office' || type === 'stadium') {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                                icon: {
-                                    url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                                }
-                            })
-                        }
-                        else {
-                            new maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name
-                            });
-                        }
-
-
+        service.nearbySearch(request, (results, status) => {
+            if (status === mapsApi.places.PlacesServiceStatus.OK) {
+                const newMarkers = results.map(place => {
+                    const marker = new mapsApi.Marker({
+                        position: place.geometry.location,
+                        map,
+                        title: place.name,
+                        visible: checkedTypes[type], // Use checked state to set visibility
+                        customType: type // Custom attribute to manage visibility later
                     });
-                    return acc;
-                }, {});
-
-                console.log(placesObject);
-            })
-            .catch(error => console.error(error));
+                    return marker;
+                });
+                setMarkers(prevMarkers => [...prevMarkers, ...newMarkers]);
+            }
+        });
     };
 
+    useEffect(() => {
+        // Clear previous markers when type selection changes
+        markers.forEach(marker => marker.setMap(null));
+        setMarkers([]);
+
+        // Fetch and place new markers for each selected type
+        Object.keys(checkedTypes).forEach(type => {
+            if (checkedTypes[type]) fetchPlacesAndPlaceMarkers(type);
+        });
+
+    }, [checkedTypes, map, mapsApi]);
 
     return (
-        <div style={{ height: '100vh', width: '100%' }}>
-            {/* Enhanced Search Bar */}
-            <input
-                ref={autocompleteInput}
-                type="text"
-                placeholder="Enter a location"
-                style={{
-                    width: '300px',
-                    height: '40px',
-                    position: 'absolute',
-                    top: '10px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: '5',
-                    padding: '10px',
-                    border: '1px solid #ccc',
-                    borderRadius: '20px',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-                    fontSize: '16px',
-                    outline: 'none'
-                }}
-            />
-
-            <GoogleMapReact
-                bootstrapURLKeys={{ key: apiKey, libraries: 'places,visualization' }}
-                defaultCenter={defaultProps.center}
-                defaultZoom={defaultProps.zoom}
-                onGoogleApiLoaded={({ map, maps }) => handleApiLoaded(map, maps)}
-                yesIWantToUseGoogleMapApiInternals
-            />
+        <div style={{ height: '100vh', display: 'flex', width: '100%' }}>
+            <div style={{ width: '300px', overflowY: 'auto', padding: '20px' }}>
+                {placeOptions.map(option => (
+                    <div key={option.value}>
+                        <input
+                            type="checkbox"
+                            id={option.value}
+                            checked={checkedTypes[option.value] || false}
+                            onChange={() => handleCheckboxChange(option.value)}
+                        />
+                        <label htmlFor={option.value}>{option.label}</label>
+                    </div>
+                ))}
+            </div>
+            <div style={{ flex: 1 }}>
+                <GoogleMapReact
+                    bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}
+                    defaultCenter={{
+                        lat: 45.501690,
+                        lng: -73.567253
+                    }}
+                    defaultZoom={11}
+                    yesIWantToUseGoogleMapApiInternals
+                    onGoogleApiLoaded={({ map, maps }) => {
+                        setMap(map);
+                        setMapsApi(maps);
+                    }}
+                />
+            </div>
         </div>
     );
 }
