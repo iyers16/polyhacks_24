@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;1,300&family=Roboto:ital,wght@0,100;0,300;0,400;0,700;1,300;1,400&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+    font-family: 'Roboto', sans-serif;
+}
+li{
+    list-style: none;
+}
+.navbar{
+    background: linear-gradient(135deg, #ffffff 0%, rgba(25, 25, 46, 0.25) 100%);
+    transition: background-color 0.3s ease; /* Smooth transition for any background color change */
+    height: 10vh;
+    line-height: 10vh;
+    box-shadow:rgba(50,50,93,0.25) 0 30px 30px -20px;
+    display: flex;
+    background-color: transparent;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo{
+    font-size: 30px;
+    padding-left: 20px;
+}
+.nav-links{
+    display: flex;
+    justify-content: flex-end;
+    width: 75%;
+    list-style: none;
+    
+}
+
+.nav-links li{
+    color: black;
+    font-size: 20px;
+    padding: 0 10px;
+    margin: 0 10px;
+    cursor: pointer;
+    text-transform: capitalize;
+    text-decoration: none;
+}
+button{
+    border: none;
+    background: none;
+    font-size: 20px;
+}
+.mobile-menu-icon{
+    display:none;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    padding-left: 20px; /* Maintain the padding from the original logo class */
+}
+
+.navbar-logo {
+    height: 60px; /* Adjust the size as necessary */
+    margin-right: 10px; /* Provides some space between the logo and the text */
+}
+
+@media(max-width:768px){
+    .nav-links{
+        display: none;
+    }
+    .nav-links-mobile{
+        background: linear-gradient(135deg, rgba(25, 25, 201, 0.25) 0%, rgba(25, 25, 46, 0.25) 100%);
+        position: absolute;
+        display: block;
+        list-style: none;
+        box-shadow:rgba(50,50,93,0.25) 0 30px 30px -20px;
+        left:0;
+        top: 10%;
+        transition: all 0.5s ease-in-out;
+        width: 100%;
+        background-color: transparent;
+
+    }
+    ul li{
+        padding: 32px;
+        width: 100%;
+        transition: all 0.5s ease-in-out;
+        text-align: center;
+
+    }
+    .mobile-menu-icon{
+        position: absolute;
+        display: block;
+        right: 20px;
+
+    }
+    .logo-container {
+        margin-left: 10px; /* Adjust as needed for mobile layout */
+    }
+
+}
+/* Target the <Link> components within .nav-links and .nav-links-mobile classes */
+.nav-links a, .nav-links-mobile a {
+    text-decoration: none; /* Removes the underline */
+    color: inherit; /* Optional: ensures link color matches the surrounding text or specified color */
+}
