@@ -42,6 +42,28 @@ const placeOptions = [
     { value: 'university', label: 'University' }
 
 ];
+const mockOffers = [
+    {
+      lat: 45.5017, // Downtown Montreal
+      lng: -73.5673,
+      businessName: "Café Montréal",
+      description: "Get a free croissant with any coffee purchase",
+      code: "CAFEMTL",
+    },
+    {
+      lat: 45.5087, // Old Port of Montreal
+      lng: -73.554,
+      businessName: "Old Port Books",
+      description: "20% off on all travel guides",
+      code: "OPB20",
+    },
+  ];
+
+  const findNearbyOffers = () => {
+    // Return all mock offers without checking for proximity
+    return mockOffers;
+  };
+
 
 
 export default function RoutePlanner() {
@@ -280,23 +302,32 @@ export default function RoutePlanner() {
                        <b>${fuelSaved.toFixed(2)}</b> liters of fuel saved<br>
                        <b>${caloriesBurned.toFixed(2)}</b> calories burned`,
                 icon: 'success',
-                confirmButtonText: 'Keep it up!',
-                customClass: {
-                  confirmButton: 'btn btn-success',
-                },
-                buttonsStyling: false,
+                confirmButtonText: 'See Offers',
+              }).then(() => {
+                // Retrieve and display offers regardless of proximity
+                const offers = findNearbyOffers(); // Now this always returns all mock offers
+                const offersHtml = offers.map(offer => `
+                  <div><strong>${offer.businessName}</strong>: ${offer.description}
+                  <br>Show this code for your discount: <strong>${offer.code}</strong></div>
+                `).join('<br>');
+          
+                // Display the offers using SweetAlert2
+                Swal.fire({
+                  title: 'Exclusive Discounts for Sustainable Choices!',
+                  html: offersHtml,
+                  icon: 'info',
+                  confirmButtonText: 'Awesome!',
+                });
               });
             } else {
               Swal.fire('Oops...', "We couldn't calculate the route. There may be no available paths for the selected travel mode.", 'error');
             }
-          });
-      
-          // Create markers for each place
-          placesDetails.forEach((place, index) => createMarker(place, index));
-        } else {
-          alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
-        }
-      };
+    });
+    placesDetails.forEach((place, index) => createMarker(place, index));
+  } else {
+    alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
+  }
+};
       
       
       
