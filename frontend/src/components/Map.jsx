@@ -215,12 +215,17 @@ export default function MapPage() {
                     placeholder="Search for location"
                     style={{
                         position: 'absolute',
-                        width: '300px',
+                        width: '400px',
                         top: '10px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        zIndex: '5'
-                    }}
+                        zIndex: '5',
+                        padding: '12px', 
+                        borderRadius: '20px', 
+                        border: '2px solid #4CAF50', 
+                        fontSize: '18px', 
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)' 
+                      }}
                 />
                 <GoogleMapReact
                     bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}

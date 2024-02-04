@@ -11,9 +11,10 @@
     cursor: pointer;
     z-index: 1000;
     /* Higher z-index to ensure the button is above other elements */
-    font-size: 24px;
+    font-size: 15px;
     /* Larger font size for the hamburger icon */
     border-radius: 4px;
+    
 }
 
 .hidden {
@@ -28,6 +29,7 @@
 
 /* Sidebar styles */
 .sidebar {
+  top: 400px;
     width: 250px;
     background: #A4D4AE;
     /* Light green background */
