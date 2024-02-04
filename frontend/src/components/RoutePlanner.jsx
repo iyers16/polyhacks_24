@@ -76,6 +76,8 @@ export default function RoutePlanner() {
     const [directionsRenderer, setDirectionsRenderer] = useState(null); 
     const [travelMode, setTravelMode] = useState('WALKING');
     const [selectedAmenityInfo, setSelectedAmenityInfo] = useState(null);
+    const [error, setError] = useState(null);
+
 
     const getRatingStars = (rating) => {
         if (!rating || rating < 1) {
@@ -194,9 +196,9 @@ export default function RoutePlanner() {
 
       const fetchPlacesAndDrawRoute = async () => {
         if (!mapsApi || !map || !currentLocation || selectedAmenities.length === 0) {
-          alert("Please ensure you've selected amenities and set a current location.");
-          return;
-        }
+            alert("Please ensure you've selected amenities and set a current location.");
+            return;
+          }
       
         // Clear previous directions if they exist
         if (directionsRenderer) {
