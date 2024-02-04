@@ -5,6 +5,10 @@ import Swal from 'sweetalert2';
 import GoogleMapReact from 'google-map-react';
 import Select from 'react-select';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+
+
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
@@ -42,6 +46,28 @@ const placeOptions = [
     { value: 'university', label: 'University' }
 
 ];
+const mockOffers = [
+    {
+      lat: 45.5017, // Downtown Montreal
+      lng: -73.5673,
+      businessName: "PolyHacks Coffee",
+      description: "Get a free croissant with any coffee purchase",
+      code: "POLY",
+    },
+    {
+      lat: 45.5087, // Old Port of Montreal
+      lng: -73.554,
+      businessName: "Tea Sip",
+      description: "Buy one, get one free on all tea varieties",
+      code: "TEASIP",
+    },
+  ];
+
+  const findNearbyOffers = () => {
+    // Return all mock offers without checking for proximity
+    return mockOffers;
+  };
+
 
 
 export default function RoutePlanner() {
@@ -54,6 +80,8 @@ export default function RoutePlanner() {
     const [directionsRenderer, setDirectionsRenderer] = useState(null); 
     const [travelMode, setTravelMode] = useState('WALKING');
     const [selectedAmenityInfo, setSelectedAmenityInfo] = useState(null);
+    const [error, setError] = useState(null);
+
 
     const getRatingStars = (rating) => {
         if (!rating || rating < 1) {
@@ -172,9 +200,13 @@ export default function RoutePlanner() {
 
       const fetchPlacesAndDrawRoute = async () => {
         if (!mapsApi || !map || !currentLocation || selectedAmenities.length === 0) {
-          alert("Please ensure you've selected amenities and set a current location.");
-          return;
-        }
+            Swal.fire({
+                title: "Oops! You Forgot Something",
+                text: "Please ensure you've selected where you want to go and set a current location.",
+                icon: <FontAwesomeIcon icon={faExclamationCircle} color="red" />,
+              });
+            return;
+          }
       
         // Clear previous directions if they exist
         if (directionsRenderer) {
@@ -212,9 +244,14 @@ export default function RoutePlanner() {
             service.nearbySearch(request, (results, status) => {
               if (status === mapsApi.places.PlacesServiceStatus.OK) {
                 resolve(results);
-              } else {
-                reject(new Error(`Failed to fetch places due to: ${status}`));
+            } else {
+                Swal.fire({
+                  title: "Error",
+                  text: "We couldn't calculate the route. There may be no available paths for the selected travel mode.",
+                  icon: "error",
+                });
               }
+
             });
           });
       
@@ -280,23 +317,32 @@ export default function RoutePlanner() {
                        <b>${fuelSaved.toFixed(2)}</b> liters of fuel saved<br>
                        <b>${caloriesBurned.toFixed(2)}</b> calories burned`,
                 icon: 'success',
-                confirmButtonText: 'Keep it up!',
-                customClass: {
-                  confirmButton: 'btn btn-success',
-                },
-                buttonsStyling: false,
+                confirmButtonText: 'See Offers',
+              }).then(() => {
+                // Retrieve and display offers regardless of proximity
+                const offers = findNearbyOffers(); // Now this always returns all mock offers
+                const offersHtml = offers.map(offer => `
+                  <div><strong>${offer.businessName}</strong>: ${offer.description}
+                  <br>Show this code for your discount: <strong>${offer.code}</strong></div>
+                `).join('<br>');
+          
+                // Display the offers using SweetAlert2
+                Swal.fire({
+                  title: 'Exclusive Discounts for Sustainable Choices!',
+                  html: offersHtml,
+                  icon: 'info',
+                  confirmButtonText: 'Awesome!',
+                });
               });
             } else {
               Swal.fire('Oops...', "We couldn't calculate the route. There may be no available paths for the selected travel mode.", 'error');
             }
-          });
-      
-          // Create markers for each place
-          placesDetails.forEach((place, index) => createMarker(place, index));
-        } else {
-          alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
-        }
-      };
+    });
+    placesDetails.forEach((place, index) => createMarker(place, index));
+  } else {
+    alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
+  }
+};
       
       
       
