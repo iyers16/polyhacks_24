@@ -49,6 +49,17 @@ button{
 .mobile-menu-icon{
     display:none;
 }
+.logo-container {
+    display: flex;
+    align-items: center;
+    padding-left: 20px; /* Maintain the padding from the original logo class */
+}
+
+.navbar-logo {
+    height: 60px; /* Adjust the size as necessary */
+    margin-right: 10px; /* Provides some space between the logo and the text */
+}
+
 @media(max-width:768px){
     .nav-links{
         display: none;
@@ -77,6 +88,9 @@ button{
         display: block;
         right: 20px;
 
+    }
+    .logo-container {
+        margin-left: 10px; /* Adjust as needed for mobile layout */
     }
 
 }
