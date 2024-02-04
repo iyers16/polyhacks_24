@@ -48,10 +48,7 @@ function SearchBar({ onPlaceSelected }) {
       style={{
         width: '500px',
         height: '40px',
-        position: 'absolute',
-        top: '10px',
-        left: '50%',
-        transform: 'translateX(-50%)',
+
         zIndex: '5',
         padding: '10px',
         border: '1px solid #ccc',

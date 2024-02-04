@@ -1,0 +1,33 @@
+
+
+body {
+    background-repeat: no-repeat;
+    background-image: linear-gradient(to top, white, #2EAF7D);
+    background-size: cover;
+    height: 100%;
+    margin: 0; /* Ensure there's no default margin */
+}
+
+
+h1{
+    padding: 3rem;
+    text-align: center;
+}
+
+p{
+    text-align: center;
+    position: absolute;
+    top: calc(50% - 120px); /* Adjust this value to move the text up from the center */
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 1; /* Ensure text is above the background but below the search bar */
+}
+
+.search-container {
+    position: absolute; /* Positioning it absolutely to place it in the center */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center it on the exact center of the screen */
+    width: fit-content; /* Shrink to fit the content */
+}
