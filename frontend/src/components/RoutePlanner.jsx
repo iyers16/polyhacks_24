@@ -1,6 +1,7 @@
 /* global google */
 
 import React, { useState, useEffect, useRef } from 'react';
+import Swal from 'sweetalert2';
 import GoogleMapReact from 'google-map-react';
 import Select from 'react-select';
 
@@ -258,14 +259,35 @@ export default function RoutePlanner() {
       
           directionsService.route(routeRequest, (result, status) => {
             if (status === 'OK') {
-              const totalDuration = result.routes[0].legs.reduce((sum, leg) => sum + leg.duration.value, 0);
-              if (totalDuration <= 900) { // 15 minutes in seconds
-                renderer.setDirections(result);
-              } else {
-                alert("The total travel time for the selected route exceeds 15 minutes.");
-              }
+              renderer.setDirections(result);
+          
+              // Calculate total distance in kilometers
+              const totalDistance = result.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0) / 1000;
+          
+              // Fuel Consumption Saved (assuming 7 L/100km)
+              const fuelConsumptionRate = 7; // Liters per 100 km
+              const fuelSaved = (totalDistance * fuelConsumptionRate) / 100; // Liters saved
+          
+              // Calories Burned (assuming walking at a moderate pace)
+              const stepsPerKm = 1250;
+              const caloriesPerStep = 0.04; // For a 60kg individual
+              const caloriesBurned = totalDistance * stepsPerKm * caloriesPerStep;
+          
+              // Display the information in a SweetAlert2 modal
+              Swal.fire({
+                title: 'Great Job!',
+                html: `<b>${totalDistance.toFixed(2)}</b> km covered<br>
+                       <b>${fuelSaved.toFixed(2)}</b> liters of fuel saved<br>
+                       <b>${caloriesBurned.toFixed(2)}</b> calories burned`,
+                icon: 'success',
+                confirmButtonText: 'Keep it up!',
+                customClass: {
+                  confirmButton: 'btn btn-success',
+                },
+                buttonsStyling: false,
+              });
             } else {
-              alert("We couldn't calculate the route. There may be no available paths for the selected travel mode.");
+              Swal.fire('Oops...', "We couldn't calculate the route. There may be no available paths for the selected travel mode.", 'error');
             }
           });
       
