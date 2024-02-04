@@ -54,11 +54,10 @@ export default function MapPage() {
                     map.setCenter(place.geometry.location);
                     map.setZoom(17); // Zoom in to the location
 
-                    // Send the POST request to the API
-                    // const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+                    
                     const url = 'https://airquality.googleapis.com/v1/currentConditions:lookup';
 
-                    // Define the request body
+                    
                     const requestBody = {
                         location: {
                             latitude: place.geometry.location.lat(),
@@ -66,7 +65,7 @@ export default function MapPage() {
                         },
                     };
 
-                    // Make the POST request
+                    
                     fetch(`${url}?key=${apiKey}`, {
                         method: 'POST',
                         headers: {
@@ -81,25 +80,25 @@ export default function MapPage() {
                             return response.json();
                         })
                         .then((data) => {
-                            // Handle the response data here
+                           
                             console.log('Response data:', data);
 
-                            // Display the response data in the Swal component
+                           
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Here are some analytics about your location...',
-                                // text: `You have been moved to ${place.name}`,
+                               
                                 html: `
                                     AQI: ${data["indexes"][0]["aqi"]}
                                     <br>
                                     Quality: ${data["indexes"][0]["category"]}
 
 
-                                    `, // Display response data in the Swal modal
+                                    `, 
                             });
                         })
                         .catch((error) => {
-                            // Handle any errors that occurred during the fetch
+                            
                             console.error('Fetch error:', error);
                         });
                 }
@@ -128,7 +127,7 @@ export default function MapPage() {
         const updatedCheckedTypes = { ...checkedTypes, [type]: !checkedTypes[type] };
         setCheckedTypes(updatedCheckedTypes);
 
-        // Optionally, immediately update marker visibility if markers are already placed
+        
         updateMarkerVisibility(updatedCheckedTypes);
     };
 
@@ -156,7 +155,7 @@ export default function MapPage() {
                         map,
                         title: place.name,
                         visible: checkedTypes[type], // Use checked state to set visibility
-                        customType: type // Custom attribute to manage visibility later
+                        customType: type 
                     });
                     return marker;
                 });
