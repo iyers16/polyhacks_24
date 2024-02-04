@@ -31,3 +31,26 @@ p{
     transform: translate(-50%, -50%); /* Center it on the exact center of the screen */
     width: fit-content; /* Shrink to fit the content */
 }
+
+/* Go to Map Button Styles */
+.go-to-map-btn {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 15px 32px; /* Padding around the text */
+    font-size: 16px; /* Text size */
+    cursor: pointer; /* Cursor changes to a hand icon when hovering over the button */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Slightly rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    outline: none; /* Remove outline */
+    margin-top: 20px; /* Spacing from the top */
+}
+
+.go-to-map-btn:hover {
+    background-color: #45a049; /* Darker shade of green on hover */
+}
+
+.go-to-map-btn:focus {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Highlight focus with a subtle outline */
+}
