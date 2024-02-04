@@ -1,7 +1,19 @@
 import GoogleMapReact from 'google-map-react';
 import React, { useEffect, useState } from 'react';
+import "./Map.css";
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
+const categories = {
+    Healthcare: ['hospital', 'pharmacy', 'clinic'],
+    Education: ['primary_school', 'school', 'university', 'library'],
+    Food: ['restaurant', 'cafe', 'bakery', 'bar'],
+    Shopping: ['clothing_store', 'convenience_store', 'book_store', 'shopping_mall', 'store', 'supermarket'],
+    Transportation: ['bus_station', 'subway_station', 'train_station'],
+    Finance: ['atm', 'bank'],
+    Openair: ['park', 'stadium'],
+    Other: ['gym', 'laundry', 'lodging', 'police', 'post_office']
+};
 
 const placeOptions = [
     'atm', 'bank', 'bar', 'book_store', 'bus_station', 'cafe',
@@ -18,6 +30,16 @@ export default function MapPage() {
     const [mapsApi, setMapsApi] = useState(null);
     const [checkedTypes, setCheckedTypes] = useState({});
     const [markers, setMarkers] = useState([]);
+    const [openDropdown, setOpenDropdown] = useState(null);
+    const [sidebarVisible, setSidebarVisible] = useState(true);
+
+    const toggleSidebar = () => {
+        setSidebarVisible(!sidebarVisible);
+    };
+
+    const toggleDropdown = (category) => {
+        setOpenDropdown(openDropdown === category ? '' : category);
+    }
 
     useEffect(() => {
         const initialCheckedTypes = placeOptions.reduce((acc, option) => {
@@ -47,7 +69,7 @@ export default function MapPage() {
         const service = new mapsApi.places.PlacesService(map);
         const request = {
             location: map.getCenter(),
-            radius: '5000',
+            radius: '10000',
             type: type
         };
 
@@ -82,19 +104,35 @@ export default function MapPage() {
 
     return (
         <div style={{ height: '100vh', display: 'flex', width: '100%' }}>
-            <div style={{ width: '300px', overflowY: 'auto', padding: '20px' }}>
-                {placeOptions.map(option => (
-                    <div key={option.value}>
-                        <input
-                            type="checkbox"
-                            id={option.value}
-                            checked={checkedTypes[option.value] || false}
-                            onChange={() => handleCheckboxChange(option.value)}
-                        />
-                        <label htmlFor={option.value}>{option.label}</label>
+            <button className="hamburger" onClick={toggleSidebar}>
+                &#9776; {/* Unicode for hamburger icon */}
+            </button>
+            <div className={`sidebar ${sidebarVisible ? '' : 'hidden'}`}>
+                {Object.keys(categories).map(category => (
+                    <div key={category}>
+                        <div className="category-header" onClick={() => toggleDropdown(category)}>
+                            {category}
+                        </div>
+                        <div className={`dropdown-content ${openDropdown === category ? 'show' : ''}`}>
+                            {categories[category].map(type => {
+                                const option = placeOptions.find(o => o.value === type);
+                                return option ? (
+                                    <div key={option.value} className="filter-option">
+                                        <input
+                                            type="checkbox"
+                                            id={option.value}
+                                            checked={checkedTypes[option.value]}
+                                            onChange={() => handleCheckboxChange(option.value)}
+                                        />
+                                        <label htmlFor={option.value}>{option.label}</label>
+                                    </div>
+                                ) : null;
+                            })}
+                        </div>
                     </div>
                 ))}
             </div>
+
             <div style={{ flex: 1 }}>
                 <GoogleMapReact
                     bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}
@@ -102,7 +140,7 @@ export default function MapPage() {
                         lat: 45.501690,
                         lng: -73.567253
                     }}
-                    defaultZoom={11}
+                    defaultZoom={12}
                     yesIWantToUseGoogleMapApiInternals
                     onGoogleApiLoaded={({ map, maps }) => {
                         setMap(map);
