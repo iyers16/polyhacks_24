@@ -1,10 +1,12 @@
 # Radius 15
 
 #Overview
+
 Our app promotes sustainable living in Montreal by visualizing essential services within a 15-minute walking radius, encouraging users to rely less on cars and embrace walking or cycling. With a multi-stop route optimization feature, we save time and minimize carbon footprint by optimizing routes for efficiency. Continuously improving sustainability features, such as promoting green spaces and eco-conscious businesses, our goal is to inspire Montreal residents to lead greener lives for a healthier city future.
 
 
 #Features
+
 
 Customizable Map View: Users can customize the map view to display specific categories of amenities and services, such as grocery stores, parks, cafes, schools, and public transportation stops.
 
