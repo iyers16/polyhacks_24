@@ -6,7 +6,7 @@ Our app promotes sustainable living in Montreal by visualizing essential service
 
 ## Features
 
-1. Customizable Map View: Users can customize the map view to display specific categories of amenities and services, such as grocery stores, parks, cafes, schools, and public transportation stops.
+1. Customizable Map View: Users can customize the map view to display specific categories of necessities and services, such as grocery stores, parks, cafes, schools, and public transportation stops.
 
 2. Search Functionality: The map includes a search feature that enables users to quickly find specific locations or types of establishments within a 15-minute radius.
 
