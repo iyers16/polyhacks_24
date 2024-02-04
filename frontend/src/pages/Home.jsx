@@ -17,8 +17,8 @@ const Home = () => {
         <div className="homepage">
             <NavBar />
             <div className="text">
-                <h1>WELCOME TO OUR 15-MINUTE CITY HEATMAP</h1>
-                <p>Discover Montreal with our revolutionary 15-minute heatmap.</p>
+                <h1>WELCOME TO OUR WALKABLE 15-MINUTE CITY </h1>
+                <p>Discover Montreal with our revolutionary 15-minute all inclusive map.</p>
             </div>
             <div className="search-container">
             <button onClick={goToMap} className="go-to-map-btn">Go to Map</button>

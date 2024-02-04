@@ -1,11 +1,15 @@
 
-
-body {
-    background-repeat: no-repeat;
-
-    background-size: cover;
-    height: 100%;
-    margin: 0; /* Ensure there's no default margin */
+body::before {
+    content: "";
+    position:absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('./image.png') center center / cover no-repeat fixed; 
+    /* This shorthand combines background-position, background-size, background-repeat, and background-attachment */
+    opacity: 0.5; /* Set the opacity to your desired level for lightness */
+    z-index: -1; /* Situate the background behind other content */
 }
 
 

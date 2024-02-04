@@ -15,7 +15,7 @@ export const NavBar = () => {
                 <h3 className="logo">RADIUS15</h3>
             </div>
             <ul className={Mobile ? "nav-links-mobile" : "nav-links"} onClick={()=> setMobile(false)}>
-                <Link to='/Home'><li>Home</li></Link>
+               
                 <Link to='/HeatMap'><li>Let me Lead You</li></Link>
             </ul>
             <button className="mobile-menu-icon" onClick={() => setMobile(!Mobile)}>

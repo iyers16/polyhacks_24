@@ -11,7 +11,8 @@ li{
     list-style: none;
 }
 .navbar{
-    
+    background: linear-gradient(135deg, #ffffff 0%, rgba(25, 25, 46, 0.25) 100%);
+    transition: background-color 0.3s ease; /* Smooth transition for any background color change */
     height: 10vh;
     line-height: 10vh;
     box-shadow:rgba(50,50,93,0.25) 0 30px 30px -20px;
@@ -65,6 +66,7 @@ button{
         display: none;
     }
     .nav-links-mobile{
+        background: linear-gradient(135deg, rgba(25, 25, 201, 0.25) 0%, rgba(25, 25, 46, 0.25) 100%);
         position: absolute;
         display: block;
         list-style: none;
