@@ -5,6 +5,7 @@ import Select from 'react-select';
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
+
 const placeOptions = [
     { value: 'atm', label: 'ATM' },
     { value: 'bank', label: 'Bank' },
@@ -48,6 +49,8 @@ export default function RoutePlanner() {
     const [mapsApi, setMapsApi] = useState(null);
     const [markers, setMarkers] = useState([]); 
     const [directionsRenderer, setDirectionsRenderer] = useState(null); 
+    const [travelMode, setTravelMode] = useState('WALKING');
+
 
     useEffect(() => {
         // Clear previous markers from the map
@@ -128,19 +131,16 @@ export default function RoutePlanner() {
       
         const service = new mapsApi.places.PlacesService(map);
         const directionsService = new mapsApi.DirectionsService();
-
         
-      
-     // Check if a directionsRenderer already exists, if not, create a new one with polylineOptions
-  const renderer = directionsRenderer || new mapsApi.DirectionsRenderer({
-    polylineOptions: {
-      strokeColor: 'green',
-      strokeOpacity: 0.8,
-      strokeWeight: 6
-    }
-  });
-  renderer.setMap(map);
-        // Store the renderer in the component's state if it's newly created
+        const renderer = directionsRenderer || new mapsApi.DirectionsRenderer({
+          polylineOptions: {
+            strokeColor: 'green',
+            strokeOpacity: 0.8,
+            strokeWeight: 6
+          }
+        });
+        renderer.setMap(map);
+        
         if (!directionsRenderer) {
           setDirectionsRenderer(renderer);
         }
@@ -184,26 +184,24 @@ export default function RoutePlanner() {
             destination: waypoints[waypoints.length - 1].location,
             waypoints: waypoints.slice(0, -1),
             optimizeWaypoints: true,
-            travelMode: mapsApi.TravelMode.WALKING,
+            travelMode: mapsApi.TravelMode[travelMode],
           };
       
           directionsService.route(routeRequest, (result, status) => {
             if (status === 'OK') {
-              const totalDuration = result.routes[0].legs.reduce((sum, leg) => sum + leg.duration.value, 0); // Sum up the duration of all legs
-              if (totalDuration <= 1200) { 
+              const totalDuration = result.routes[0].legs.reduce((sum, leg) => sum + leg.duration.value, 0);
+              if (totalDuration <= 1000) { 
                 renderer.setDirections(result);
               } else {
-                // Warn the user that the route exceeds the 15-minute walk limit
-                const proceed = window.confirm("The total walking time for the selected route exceeds 15 minutes. Would you like to proceed anyway?");
+                const proceed = window.confirm("The total travel time for the selected route exceeds 15 minutes. Would you like to proceed anyway?");
                 if (proceed) {
-                  // User chooses to proceed despite the warning
                   renderer.setDirections(result);
                 } else {
-                  // User chooses not to proceed; you might clear the current route or take other actions
+                  // Handle the case where the user chooses not to proceed
                 }
               }
             } else {
-              alert("We couldn't calculate the route. There may be no available walking paths.");
+              alert("We couldn't calculate the route. There may be no available paths for the selected travel mode.");
             }
           });
       
@@ -213,6 +211,7 @@ export default function RoutePlanner() {
           alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
         }
       };
+      
       
 
 
@@ -245,6 +244,26 @@ export default function RoutePlanner() {
                 border: '1px solid #ddd'
               }}
             />
+             <label>
+    <input
+      type="radio"
+      name="travelMode"
+      value="WALKING"
+      checked={travelMode === 'WALKING'}
+      onChange={() => setTravelMode('WALKING')}
+    />
+    Walking
+  </label>
+  <label>
+    <input
+      type="radio"
+      name="travelMode"
+      value="BICYCLING"
+      checked={travelMode === 'BICYCLING'}
+      onChange={() => setTravelMode('BICYCLING')}
+    />
+    Biking
+  </label>
             <Select
               isMulti
               options={placeOptions}
