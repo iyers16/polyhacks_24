@@ -48,14 +48,14 @@ const placeOptions = [
 ];
 const mockOffers = [
     {
-      lat: 45.5017, // Downtown Montreal
+      lat: 45.5017, 
       lng: -73.5673,
       businessName: "PolyHacks Coffee",
       description: "Get a free croissant with any coffee purchase",
       code: "POLY",
     },
     {
-      lat: 45.5087, // Old Port of Montreal
+      lat: 45.5087, 
       lng: -73.554,
       businessName: "Tea Sip",
       description: "Buy one, get one free on all tea varieties",
@@ -64,7 +64,7 @@ const mockOffers = [
   ];
 
   const findNearbyOffers = () => {
-    // Return all mock offers without checking for proximity
+  
     return mockOffers;
   };
 
@@ -119,10 +119,10 @@ export default function RoutePlanner() {
 
 
     useEffect(() => {
-        // Clear previous markers from the map
+      
         markers.forEach(marker => marker.setMap(null));
         setMarkers([]);
-      }, [selectedAmenities]); // Dependency array includes selectedAmenities to clear markers when selection changes
+      }, [selectedAmenities]);
     
       useEffect(() => {
         if (mapsApi && map) {
@@ -208,7 +208,7 @@ export default function RoutePlanner() {
             return;
           }
       
-        // Clear previous directions if they exist
+       
         if (directionsRenderer) {
           directionsRenderer.setDirections(null);
         }
@@ -231,7 +231,7 @@ export default function RoutePlanner() {
       
         let allPlaces = [];
       
-        // Gather all nearby amenities for each selected category
+      
         for (const amenity of selectedAmenities) {
           const request = {
             location: currentLocation,
@@ -239,7 +239,7 @@ export default function RoutePlanner() {
             type: amenity.value,
           };
       
-          // Search for places
+         
           const results = await new Promise((resolve, reject) => {
             service.nearbySearch(request, (results, status) => {
               if (status === mapsApi.places.PlacesServiceStatus.OK) {
@@ -258,7 +258,7 @@ export default function RoutePlanner() {
           allPlaces.push(...results);
         }
       
-        // Sort allPlaces by distance from the current location
+       
         allPlaces.sort((a, b) => {
           const distA = google.maps.geometry.spherical.computeDistanceBetween(
             new google.maps.LatLng(a.geometry.location.lat(), a.geometry.location.lng()),
@@ -271,7 +271,7 @@ export default function RoutePlanner() {
           return distA - distB;
         });
       
-        // Take the nearest places as waypoints, ensuring they're unique
+        
         let waypoints = [];
         let placesDetails = [];
         allPlaces.forEach(place => {
@@ -285,7 +285,7 @@ export default function RoutePlanner() {
         });
       
         if (waypoints.length > 0) {
-          // Calculate the route through the waypoints
+          
           const routeRequest = {
             origin: currentLocation,
             destination: waypoints[waypoints.length - 1].location,
@@ -298,19 +298,19 @@ export default function RoutePlanner() {
             if (status === 'OK') {
               renderer.setDirections(result);
           
-              // Calculate total distance in kilometers
+            
               const totalDistance = result.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0) / 1000;
           
-              // Fuel Consumption Saved (assuming 7 L/100km)
-              const fuelConsumptionRate = 7; // Liters per 100 km
-              const fuelSaved = (totalDistance * fuelConsumptionRate) / 100; // Liters saved
+             
+              const fuelConsumptionRate = 7; 
+              const fuelSaved = (totalDistance * fuelConsumptionRate) / 100; 
           
-              // Calories Burned (assuming walking at a moderate pace)
+             
               const stepsPerKm = 1250;
               const caloriesPerStep = 0.04; // For a 60kg individual
               const caloriesBurned = totalDistance * stepsPerKm * caloriesPerStep;
           
-              // Display the information in a SweetAlert2 modal
+            
               Swal.fire({
                 title: 'Great Job!',
                 html: `<b>${totalDistance.toFixed(2)}</b> km covered<br>
@@ -319,14 +319,14 @@ export default function RoutePlanner() {
                 icon: 'success',
                 confirmButtonText: 'See Offers',
               }).then(() => {
-                // Retrieve and display offers regardless of proximity
-                const offers = findNearbyOffers(); // Now this always returns all mock offers
+               
+                const offers = findNearbyOffers(); 
                 const offersHtml = offers.map(offer => `
                   <div><strong>${offer.businessName}</strong>: ${offer.description}
                   <br>Show this code for your discount: <strong>${offer.code}</strong></div>
                 `).join('<br>');
           
-                // Display the offers using SweetAlert2
+               
                 Swal.fire({
                   title: 'Exclusive Discounts for Sustainable Choices!',
                   html: offersHtml,
@@ -384,7 +384,7 @@ export default function RoutePlanner() {
     value="WALKING"
     checked={travelMode === 'WALKING'}
     onChange={() => setTravelMode('WALKING')}
-    style={{ display: 'none' }} // Hide the default radio button
+    style={{ display: 'none' }} 
   />
   <span style={{ position: 'relative', marginRight: '8px', width: '16px', height: '16px', border: '2px solid #4CAF50', borderRadius: '50%' }}>
     {travelMode === 'WALKING' && (
@@ -412,7 +412,7 @@ export default function RoutePlanner() {
     value="BICYCLING"
     checked={travelMode === 'BICYCLING'}
     onChange={() => setTravelMode('BICYCLING')}
-    style={{ display: 'none' }} // Hide the default radio button
+    style={{ display: 'none' }} 
   />
   <span style={{ position: 'relative', marginRight: '8px', width: '16px', height: '16px', border: '2px solid #4CAF50', borderRadius: '50%' }}>
     {travelMode === 'BICYCLING' && (
@@ -471,7 +471,7 @@ export default function RoutePlanner() {
           <div style={{ height: '100%', width: '100%' }}>
             <GoogleMapReact
               bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}
-              defaultCenter={{ lat: 45.5017, lng: -73.5673 }} // Montreal's coordinates
+              defaultCenter={{ lat: 45.5017, lng: -73.5673 }} 
               defaultZoom={14}
               yesIWantToUseGoogleMapApiInternals
               onGoogleApiLoaded={({ map, maps }) => {
