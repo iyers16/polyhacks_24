@@ -50,6 +50,41 @@ export default function RoutePlanner() {
     const [markers, setMarkers] = useState([]); 
     const [directionsRenderer, setDirectionsRenderer] = useState(null); 
     const [travelMode, setTravelMode] = useState('WALKING');
+    const [selectedAmenityInfo, setSelectedAmenityInfo] = useState(null);
+
+    const getRatingStars = (rating) => {
+        if (!rating || rating < 1) {
+          return 'N/A';
+        }
+      
+        const roundedRating = Math.round(rating);
+        const starIcons = '★'.repeat(roundedRating);
+        const emptyStars = '☆'.repeat(5 - roundedRating);
+      
+        return `${starIcons}${emptyStars}`;
+      };
+      
+
+    const fetchAmenityDetails = async (placeId) => {
+        if (!mapsApi) return;
+      
+        const placeService = new mapsApi.places.PlacesService(map);
+      
+        placeService.getDetails({ placeId, fields: ['name', 'formatted_address', 'rating', 'user_ratings_total', 'formatted_phone_number', 'website'] }, (result, status) => {
+          if (status === mapsApi.places.PlacesServiceStatus.OK) {
+            setSelectedAmenityInfo(result);
+          } else {
+            console.error(`Failed to fetch amenity details: ${status}`);
+            setSelectedAmenityInfo(null);
+          }
+        });
+      };
+      
+
+
+      
+
+    
 
 
     useEffect(() => {
@@ -77,31 +112,45 @@ export default function RoutePlanner() {
       };
     
       const createMarker = (placeResult, index) => {
-        const labelText = `${index + 1}`; // Assuming index is the order number of your place
-      
+        const labelText = `${index + 1}`;
         const marker = new mapsApi.Marker({
           position: placeResult.geometry.location,
           map: map,
           title: placeResult.name,
           label: {
             text: labelText,
-            color: 'white', // Text color
-            fontSize: '14px', // Text size
-            fontWeight: 'bold' // Text weight
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: 'bold',
           },
           icon: {
-            // Custom styling for marker if needed
             path: mapsApi.SymbolPath.BACKWARD_CLOSED_ARROW,
-            scale: 5, // Size of the marker
-            fillColor: '#4CAF50', // Marker color
+            scale: 5,
+            fillColor: '#4CAF50',
             fillOpacity: 1,
             strokeWeight: 2,
-            labelOrigin: new mapsApi.Point(0, -15) // Position the label above the marker
-          }
+            labelOrigin: new mapsApi.Point(0, -15),
+          },
         });
       
+        let infoWindowContent = `<div><strong>${placeResult.name}</strong><br>${placeResult.vicinity}<br>Rating: ${getRatingStars(
+          placeResult.rating
+        )}<br>Open Now: ${placeResult.opening_hours && placeResult.opening_hours.open_now ? 'Yes' : 'No'}<br>`;
+      
+        if (placeResult.photos && placeResult.photos.length > 0) {
+          const photo = placeResult.photos[0];
+          const imgUrl = photo.getUrl({ maxWidth: 200, maxHeight: 200 });
+          infoWindowContent += `<img src="${imgUrl}" alt="${placeResult.name}" style="max-width: 200px; max-height: 200px;" />`;
+        }
+      
+        infoWindowContent += '</div>';
+      
         const infoWindow = new mapsApi.InfoWindow({
-          content: `<div><strong>${placeResult.name}</strong><br>${placeResult.vicinity}</div>`,
+          content: infoWindowContent,
+        });
+      
+        marker.addListener('click', () => {
+          fetchAmenityDetails(placeResult.place_id);
         });
       
         marker.addListener('mouseover', () => {
@@ -112,8 +161,10 @@ export default function RoutePlanner() {
           infoWindow.close();
         });
       
-        setMarkers(prevMarkers => [...prevMarkers, marker]);
+        setMarkers((prevMarkers) => [...prevMarkers, marker]);
       };
+      
+      
       
 
 
@@ -346,6 +397,9 @@ export default function RoutePlanner() {
                 setMapsApi(maps);
               }}
             />
+            
+
+
           </div>
         </div>
       );

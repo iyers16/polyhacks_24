@@ -10,7 +10,7 @@ export const NavBar = () => {
     const [Mobile,setMobile]=useState(false);
     return (
         <section className="navbar">
-                <h3 className="logo"> DIWLH</h3>
+                <h3 className="logo"> RADIUS15</h3>
                 <ul className={Mobile ? "nav-links-mobile" : "nav-links"} onClick={()=> setMobile(false)}>
                     <Link to='/Home'><li></li></Link>
                     <Link to='/HeatMap'><li>Let me Lead You</li></Link>
