@@ -2,7 +2,7 @@
 
 body {
     background-repeat: no-repeat;
-    background-image: linear-gradient(to top, white, #2EAF7D);
+
     background-size: cover;
     height: 100%;
     margin: 0; /* Ensure there's no default margin */
@@ -21,6 +21,7 @@ p{
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
+    
     z-index: 1; /* Ensure text is above the background but below the search bar */
 }
 

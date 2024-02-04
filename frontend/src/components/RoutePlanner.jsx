@@ -244,26 +244,65 @@ export default function RoutePlanner() {
                 border: '1px solid #ddd'
               }}
             />
-             <label>
-    <input
-      type="radio"
-      name="travelMode"
-      value="WALKING"
-      checked={travelMode === 'WALKING'}
-      onChange={() => setTravelMode('WALKING')}
-    />
-    Walking
-  </label>
-  <label>
-    <input
-      type="radio"
-      name="travelMode"
-      value="BICYCLING"
-      checked={travelMode === 'BICYCLING'}
-      onChange={() => setTravelMode('BICYCLING')}
-    />
-    Biking
-  </label>
+          <label style={{ display: 'flex', alignItems: 'center', marginRight: '20px', fontSize: '16px' }}>
+  <input
+    type="radio"
+    name="travelMode"
+    value="WALKING"
+    checked={travelMode === 'WALKING'}
+    onChange={() => setTravelMode('WALKING')}
+    style={{ display: 'none' }} // Hide the default radio button
+  />
+  <span style={{ position: 'relative', marginRight: '8px', width: '16px', height: '16px', border: '2px solid #4CAF50', borderRadius: '50%' }}>
+    {travelMode === 'WALKING' && (
+      <span
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '8px',
+          height: '8px',
+          backgroundColor: '#4CAF50',
+          borderRadius: '50%',
+          opacity: 1,
+        }}
+      ></span>
+    )}
+  </span>
+  Walking
+</label>
+<label style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>
+  <input
+    type="radio"
+    name="travelMode"
+    value="BICYCLING"
+    checked={travelMode === 'BICYCLING'}
+    onChange={() => setTravelMode('BICYCLING')}
+    style={{ display: 'none' }} // Hide the default radio button
+  />
+  <span style={{ position: 'relative', marginRight: '8px', width: '16px', height: '16px', border: '2px solid #4CAF50', borderRadius: '50%' }}>
+    {travelMode === 'BICYCLING' && (
+      <span
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '8px',
+          height: '8px',
+          backgroundColor: '#4CAF50',
+          borderRadius: '50%',
+          opacity: 1,
+        }}
+      ></span>
+    )}
+  </span>
+  Biking
+</label>
+
+
+
             <Select
               isMulti
               options={placeOptions}
