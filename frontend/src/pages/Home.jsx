@@ -8,7 +8,7 @@ import Map from "../components/Map";
 const Home = () => {
     const navigate = useNavigate();
     const goToMap = () => {
-        navigate('/map'); // Navigate to the Map component
+        navigate('/map'); 
     };
     
 

@@ -1,8 +1,6 @@
 .hamburger {
     background: #75B79E;
-    /* Medium green background */
     color: #3A6351;
-    /* Dark green text */
     padding: 10px 15px;
     border: none;
     position: fixed;
@@ -10,9 +8,7 @@
     left: 10px;
     cursor: pointer;
     z-index: 1000;
-    /* Higher z-index to ensure the button is above other elements */
     font-size: 15px;
-    /* Larger font size for the hamburger icon */
     border-radius: 4px;
     
 }
@@ -21,20 +17,17 @@
     display: none;
 }
 
-/* Add this to ensure the sidebar and button don't overlap the map when sidebar is hidden */
+
 .sidebar.hidden+.map-container {
     flex-basis: 100%;
 }
 
 
-/* Sidebar styles */
 .sidebar {
   top: 400px;
     width: 250px;
     background: #A4D4AE;
-    /* Light green background */
     color: #3A6351;
-    /* Dark green color for text */
     padding: 20px;
     height: 100vh;
     overflow-y: auto;
@@ -42,10 +35,10 @@
     font-family: Arial, sans-serif;
 }
 
-/* Category header styles */
+
 .category-header {
     background-color: #75B79E;
-    /* Medium green background */
+    
     color: #3A6351;
     padding: 10px;
     margin: 10px 0;
@@ -56,23 +49,23 @@
 
 .category-header:hover {
     background-color: #3A6351;
-    /* Dark green color for hover */
+
     color: #A4D4AE;
 }
 
-/* Dropdown content styles */
+
 .dropdown-content {
     display: none;
     background-color: transparent;
     padding-left: 10px;
 }
 
-/* Show dropdown content when clicked */
+
 .show {
     display: block;
 }
 
-/* Filter option styles */
+
 .filter-option {
     display: block;
     margin: 5px 0;
@@ -84,11 +77,10 @@
     cursor: pointer;
 }
 
-/* Custom checkbox styles */
 .filter-option input[type="checkbox"]+label:before {
-    /* content: '\\2714'; */
+    
     border: 2px solid #3A6351;
-    /* Dark green border */
+    
     border-radius: 3px;
     display: inline-block;
     width: 18px;
@@ -104,14 +96,14 @@
 /* Style for checked state */
 .filter-option input[type="checkbox"]:checked+label:before {
     background-color: #75B79E;
-    /* Medium green background for checked state */
+   
     color: #3A6351;
 }
 
 /* Header styles */
 .sidebar h2 {
     color: #3A6351;
-    /* Dark green color for headers */
+    
     text-align: center;
     margin-bottom: 20px;
 }
@@ -119,7 +111,7 @@
 /* Submit button styles */
 .submit-btn {
     background-color: #75B79E;
-    /* Medium green background */
+    
     color: #3A6351;
     padding: 10px 15px;
     border: none;
@@ -130,6 +122,6 @@
 
 .submit-btn:hover {
     background-color: #3A6351;
-    /* Dark green color for hover */
+    
     color: #A4D4AE;
 }
