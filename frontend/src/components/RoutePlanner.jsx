@@ -5,6 +5,10 @@ import Swal from 'sweetalert2';
 import GoogleMapReact from 'google-map-react';
 import Select from 'react-select';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+
+
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
@@ -46,16 +50,16 @@ const mockOffers = [
     {
       lat: 45.5017, // Downtown Montreal
       lng: -73.5673,
-      businessName: "Café Montréal",
+      businessName: "PolyHacks Coffee",
       description: "Get a free croissant with any coffee purchase",
-      code: "CAFEMTL",
+      code: "POLY",
     },
     {
       lat: 45.5087, // Old Port of Montreal
       lng: -73.554,
-      businessName: "Old Port Books",
-      description: "20% off on all travel guides",
-      code: "OPB20",
+      businessName: "Tea Sip",
+      description: "Buy one, get one free on all tea varieties",
+      code: "TEASIP",
     },
   ];
 
@@ -196,7 +200,11 @@ export default function RoutePlanner() {
 
       const fetchPlacesAndDrawRoute = async () => {
         if (!mapsApi || !map || !currentLocation || selectedAmenities.length === 0) {
-            alert("Please ensure you've selected amenities and set a current location.");
+            Swal.fire({
+                title: "Oops! You Forgot Something",
+                text: "Please ensure you've selected where you want to go and set a current location.",
+                icon: <FontAwesomeIcon icon={faExclamationCircle} color="red" />,
+              });
             return;
           }
       
@@ -236,9 +244,14 @@ export default function RoutePlanner() {
             service.nearbySearch(request, (results, status) => {
               if (status === mapsApi.places.PlacesServiceStatus.OK) {
                 resolve(results);
-              } else {
-                reject(new Error(`Failed to fetch places due to: ${status}`));
+            } else {
+                Swal.fire({
+                  title: "Error",
+                  text: "We couldn't calculate the route. There may be no available paths for the selected travel mode.",
+                  icon: "error",
+                });
               }
+
             });
           });
       
