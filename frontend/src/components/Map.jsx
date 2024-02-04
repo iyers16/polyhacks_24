@@ -1,5 +1,6 @@
 import GoogleMapReact from 'google-map-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Swal from 'sweetalert2';
 import "./Map.css";
 
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
@@ -32,6 +33,80 @@ export default function MapPage() {
     const [markers, setMarkers] = useState([]);
     const [openDropdown, setOpenDropdown] = useState(null);
     const [sidebarVisible, setSidebarVisible] = useState(true);
+    const [autocomplete, setAutocomplete] = useState(null);
+    const autocompleteInput = useRef(null);
+
+    // Function to initialize the Autocomplete
+    useEffect(() => {
+        if (mapsApi && !autocomplete) {
+            setAutocomplete(
+                new mapsApi.places.Autocomplete(autocompleteInput.current)
+            );
+        }
+    }, [mapsApi, autocomplete]);
+
+    // Add a listener to the Autocomplete component
+    useEffect(() => {
+        if (autocomplete) {
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17); // Zoom in to the location
+
+                    // Send the POST request to the API
+                    // const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+                    const url = 'https://airquality.googleapis.com/v1/currentConditions:lookup';
+
+                    // Define the request body
+                    const requestBody = {
+                        location: {
+                            latitude: place.geometry.location.lat(),
+                            longitude: place.geometry.location.lng(),
+                        },
+                    };
+
+                    // Make the POST request
+                    fetch(`${url}?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody),
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then((data) => {
+                            // Handle the response data here
+                            console.log('Response data:', data);
+
+                            // Display the response data in the Swal component
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Here are some analytics about your location...',
+                                // text: `You have been moved to ${place.name}`,
+                                html: `
+                                    AQI: ${data["indexes"][0]["aqi"]}
+                                    <br>
+                                    Quality: ${data["indexes"][0]["category"]}
+
+
+                                    `, // Display response data in the Swal modal
+                            });
+                        })
+                        .catch((error) => {
+                            // Handle any errors that occurred during the fetch
+                            console.error('Fetch error:', error);
+                        });
+                }
+
+            });
+        }
+    }, [autocomplete, map]);
 
     const toggleSidebar = () => {
         setSidebarVisible(!sidebarVisible);
@@ -134,6 +209,19 @@ export default function MapPage() {
             </div>
 
             <div style={{ flex: 1 }}>
+                <input
+                    ref={autocompleteInput}
+                    type="text"
+                    placeholder="Search for location"
+                    style={{
+                        position: 'absolute',
+                        width: '300px',
+                        top: '10px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: '5'
+                    }}
+                />
                 <GoogleMapReact
                     bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}
                     defaultCenter={{
