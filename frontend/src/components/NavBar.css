@@ -53,12 +53,12 @@ button{
 .logo-container {
     display: flex;
     align-items: center;
-    padding-left: 20px; /* Maintain the padding from the original logo class */
+    padding-left: 20px; 
 }
 
 .navbar-logo {
-    height: 60px; /* Adjust the size as necessary */
-    margin-right: 10px; /* Provides some space between the logo and the text */
+    height: 60px; 
+    margin-right: 10px; 
 }
 
 @media(max-width:768px){
@@ -92,12 +92,11 @@ button{
 
     }
     .logo-container {
-        margin-left: 10px; /* Adjust as needed for mobile layout */
+        margin-left: 10px; 
     }
 
 }
-/* Target the <Link> components within .nav-links and .nav-links-mobile classes */
 .nav-links a, .nav-links-mobile a {
-    text-decoration: none; /* Removes the underline */
-    color: inherit; /* Optional: ensures link color matches the surrounding text or specified color */
+    text-decoration: none; 
+    color: inherit; 
 }

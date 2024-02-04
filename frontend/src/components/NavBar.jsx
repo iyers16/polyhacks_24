@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./NavBar.css";
 import { FaBars } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
-import logo from './logo.png'; // Make sure to put the logo in the src folder and update the path here
+import logo from './logo.png'; 
 
 export const NavBar = () => {
     const [Mobile,setMobile]=useState(false);
