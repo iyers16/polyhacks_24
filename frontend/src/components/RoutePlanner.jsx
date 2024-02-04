@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import GoogleMapReact from 'google-map-react';
 import Select from 'react-select';
 
+
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 const placeOptions = [
@@ -35,128 +36,260 @@ const placeOptions = [
     { value: 'train_station', label: 'Train Station' },
     { value: 'transit_station', label: 'Transit Station' },
     { value: 'university', label: 'University' }
-    // Add other places as needed
+
 ];
 
 
 export default function RoutePlanner() {
-  const [currentLocation, setCurrentLocation] = useState(null);
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
-  const autocompleteRef = useRef(null);
-  const [map, setMap] = useState(null);
-  const [mapsApi, setMapsApi] = useState(null);
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [selectedAmenities, setSelectedAmenities] = useState([]);
+    const autocompleteRef = useRef(null);
+    const [map, setMap] = useState(null);
+    const [mapsApi, setMapsApi] = useState(null);
+    const [markers, setMarkers] = useState([]); 
+    const [directionsRenderer, setDirectionsRenderer] = useState(null); 
 
-  useEffect(() => {
-    if (mapsApi && map) {
-      const autocomplete = new mapsApi.places.Autocomplete(autocompleteRef.current, { types: ['geocode'] });
-      autocomplete.bindTo('bounds', map);
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (place.geometry) {
-          setCurrentLocation(place.geometry.location);
-          map.setCenter(place.geometry.location);
-        }
-      });
-    }
-  }, [mapsApi, map]);
-
-  const handleAmenitiesChange = selectedOptions => {
-    setSelectedAmenities(selectedOptions || []);
-  };
-
-  const fetchPlacesAndDrawRoute = async () => {
-    if (!mapsApi || !map || !currentLocation || selectedAmenities.length === 0) return;
-
-    const service = new mapsApi.places.PlacesService(map);
-    const directionsService = new mapsApi.DirectionsService();
-    const directionsRenderer = new mapsApi.DirectionsRenderer();
-    directionsRenderer.setMap(map);
-
-    let waypoints = [];
-    let lastLocation = currentLocation;
-
-    for (const [index, amenity] of selectedAmenities.entries()) {
-      const results = await new Promise((resolve, reject) => {
-        service.nearbySearch(
-          {
-            location: lastLocation,
-            radius: 1000, // Adjust based on your criteria
-            type: [amenity.value],
-          },
-          (results, status) => {
-            if (status === mapsApi.places.PlacesServiceStatus.OK && results[0]) {
-              resolve(results);
-            } else {
-              reject(status);
+    useEffect(() => {
+        // Clear previous markers from the map
+        markers.forEach(marker => marker.setMap(null));
+        setMarkers([]);
+      }, [selectedAmenities]); // Dependency array includes selectedAmenities to clear markers when selection changes
+    
+      useEffect(() => {
+        if (mapsApi && map) {
+          const autocomplete = new mapsApi.places.Autocomplete(autocompleteRef.current, { types: ['geocode'] });
+          autocomplete.bindTo('bounds', map);
+          autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (place.geometry) {
+              setCurrentLocation(place.geometry.location);
+              map.setCenter(place.geometry.location);
             }
-          }
-        );
-      });
-
-      if (results[0]) {
-        const destination = results[0].geometry.location;
-
-        // Add to waypoints if not the last item, otherwise set as destination
-        if (index < selectedAmenities.length - 1) {
-          waypoints.push({
-            location: destination,
-            stopover: true,
           });
         }
+      }, [mapsApi, map]);
+    
+      const handleAmenitiesChange = selectedOptions => {
+        setSelectedAmenities(selectedOptions || []);
+      };
+    
+      const createMarker = (placeResult, index) => {
+        const labelText = `${index + 1}`; // Assuming index is the order number of your place
+      
+        const marker = new mapsApi.Marker({
+          position: placeResult.geometry.location,
+          map: map,
+          title: placeResult.name,
+          label: {
+            text: labelText,
+            color: 'white', // Text color
+            fontSize: '14px', // Text size
+            fontWeight: 'bold' // Text weight
+          },
+          icon: {
+            // Custom styling for marker if needed
+            path: mapsApi.SymbolPath.BACKWARD_CLOSED_ARROW,
+            scale: 5, // Size of the marker
+            fillColor: '#4CAF50', // Marker color
+            fillOpacity: 1,
+            strokeWeight: 2,
+            labelOrigin: new mapsApi.Point(0, -15) // Position the label above the marker
+          }
+        });
+      
+        const infoWindow = new mapsApi.InfoWindow({
+          content: `<div><strong>${placeResult.name}</strong><br>${placeResult.vicinity}</div>`,
+        });
+      
+        marker.addListener('mouseover', () => {
+          infoWindow.open(map, marker);
+        });
+      
+        marker.addListener('mouseout', () => {
+          infoWindow.close();
+        });
+      
+        setMarkers(prevMarkers => [...prevMarkers, marker]);
+      };
+      
 
-        lastLocation = destination; // Update lastLocation to the current destination
-      }
-    }
 
-    // Calculate and draw the route
-    directionsService.route(
-      {
-        origin: currentLocation,
-        destination: lastLocation,
-        waypoints: waypoints,
-        optimizeWaypoints: true,
-        travelMode: mapsApi.TravelMode.WALKING,
-      },
-      (result, status) => {
-        if (status === 'OK') {
-          directionsRenderer.setDirections(result);
-        } else {
-          console.error('Directions request failed due to ' + status);
+
+      const fetchPlacesAndDrawRoute = async () => {
+        if (!mapsApi || !map || !currentLocation || selectedAmenities.length === 0) {
+          alert("Please ensure you've selected amenities and set a current location.");
+          return;
         }
-      }
-    );
-  };
+      
+        // Clear previous directions if they exist
+        if (directionsRenderer) {
+          directionsRenderer.setDirections(null);
+        }
+      
+        const service = new mapsApi.places.PlacesService(map);
+        const directionsService = new mapsApi.DirectionsService();
 
-  return (
-    <div style={{ height: '100vh', width: '100%' }}>
-      <input
-        ref={autocompleteRef}
-        type="text"
-        placeholder="Enter your current location"
-        style={{ width: '300px', height: '40px', marginBottom: '10px' }}
-      />
-      <Select
-        isMulti
-        options={placeOptions}
-        onChange={handleAmenitiesChange}
-        placeholder="Select Amenities"
-        closeMenuOnSelect={false}
-      />
-      <button onClick={fetchPlacesAndDrawRoute} style={{ marginTop: '10px' }}>
-        Calculate Walking Route
-      </button>
-      <div style={{ height: '90%', width: '100%' }}>
-        <GoogleMapReact
-          bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}
-          defaultCenter={{ lat: 40.748817, lng: -73.985428 }} // Default to NYC, adjust as needed
-          defaultZoom={12}
-          yesIWantToUseGoogleMapApiInternals
-          onGoogleApiLoaded={({ map, maps }) => {
-            setMap(map);
-            setMapsApi(maps);
-          }}
-        />
-      </div>
-    </div>
-  );
+        
+      
+     // Check if a directionsRenderer already exists, if not, create a new one with polylineOptions
+  const renderer = directionsRenderer || new mapsApi.DirectionsRenderer({
+    polylineOptions: {
+      strokeColor: 'green',
+      strokeOpacity: 0.8,
+      strokeWeight: 6
+    }
+  });
+  renderer.setMap(map);
+        // Store the renderer in the component's state if it's newly created
+        if (!directionsRenderer) {
+          setDirectionsRenderer(renderer);
+        }
+      
+        let waypoints = [];
+        let placesDetails = []; // To store details of fetched places
+      
+        for (const amenity of selectedAmenities) {
+          const request = {
+            location: currentLocation,
+            radius: '1250', // Set the search radius
+            type: amenity.value,
+          };
+      
+          // Search for places
+          const results = await new Promise((resolve, reject) => {
+            service.nearbySearch(request, (results, status) => {
+              if (status === mapsApi.places.PlacesServiceStatus.OK) {
+                resolve(results);
+              } else {
+                reject(new Error(`Failed to fetch places due to: ${status}`));
+              }
+            });
+          });
+      
+          // Assuming you take the first result as the desired place
+          if (results.length > 0) {
+            const placeResult = results[0];
+            placesDetails.push(placeResult);
+            waypoints.push({
+              location: placeResult.geometry.location,
+              stopover: true,
+            });
+          }
+        }
+      
+        if (waypoints.length > 0) {
+          // Calculate the route through the waypoints
+          const routeRequest = {
+            origin: currentLocation,
+            destination: waypoints[waypoints.length - 1].location,
+            waypoints: waypoints.slice(0, -1),
+            optimizeWaypoints: true,
+            travelMode: mapsApi.TravelMode.WALKING,
+          };
+      
+          directionsService.route(routeRequest, (result, status) => {
+            if (status === 'OK') {
+              const totalDuration = result.routes[0].legs.reduce((sum, leg) => sum + leg.duration.value, 0); // Sum up the duration of all legs
+              if (totalDuration <= 1200) { 
+                renderer.setDirections(result);
+              } else {
+                // Warn the user that the route exceeds the 15-minute walk limit
+                const proceed = window.confirm("The total walking time for the selected route exceeds 15 minutes. Would you like to proceed anyway?");
+                if (proceed) {
+                  // User chooses to proceed despite the warning
+                  renderer.setDirections(result);
+                } else {
+                  // User chooses not to proceed; you might clear the current route or take other actions
+                }
+              }
+            } else {
+              alert("We couldn't calculate the route. There may be no available walking paths.");
+            }
+          });
+      
+          // Create markers for each place
+          placesDetails.forEach((place, index) => createMarker(place, index));
+        } else {
+          alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
+        }
+      };
+      
+
+
+      
+
+      return (
+        <div style={{ height: '100vh', width: '100%', position: 'relative' }}>
+           
+          <div style={{
+            position: 'relative',
+            top: 0,
+            width: '100%',
+            padding: '20px',
+            zIndex: 5,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <input
+              ref={autocompleteRef}
+              type="text"
+              placeholder="Where Are You Now"
+              style={{
+                padding: '10px',
+                width: '400px',
+                margin: '0 10px',
+                borderRadius: '4px',
+                border: '1px solid #ddd'
+              }}
+            />
+            <Select
+              isMulti
+              options={placeOptions}
+              onChange={handleAmenitiesChange}
+              placeholder="Where do you need to go ?"
+              closeMenuOnSelect={false}
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  width: 300,
+                  margin: '0 10px',
+                }),
+                container: (base) => ({
+                  ...base,
+                  width: '100%'
+                })
+              }}
+            />
+            <button onClick={fetchPlacesAndDrawRoute} style={{
+              padding: '10px 20px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              margin: '0 10px',
+              fontSize: '16px',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+            }}>
+              Let Me Lead You
+            </button>
+          </div>
+          <div style={{ height: '100%', width: '100%' }}>
+            <GoogleMapReact
+              bootstrapURLKeys={{ key: apiKey, libraries: 'places' }}
+              defaultCenter={{ lat: 45.5017, lng: -73.5673 }} // Montreal's coordinates
+              defaultZoom={14}
+              yesIWantToUseGoogleMapApiInternals
+              onGoogleApiLoaded={({ map, maps }) => {
+                setMap(map);
+                setMapsApi(maps);
+              }}
+            />
+          </div>
+        </div>
+      );
+      
 }
