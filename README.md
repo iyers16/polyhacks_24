@@ -17,9 +17,9 @@ Interactive Markers: Interactive markers on the map provide additional informati
 Here are the commands needed to get started:
 1. Do `cd frontend`
 
-### `npm i`
+2. ### `npm i`
 
-### `npm start`
+3. ### `npm start`
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
