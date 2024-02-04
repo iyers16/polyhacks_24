@@ -1,3 +1,5 @@
+/* global google */
+
 import React, { useState, useEffect, useRef } from 'react';
 import GoogleMapReact from 'google-map-react';
 import Select from 'react-select';
@@ -124,7 +126,7 @@ export default function RoutePlanner() {
             fontWeight: 'bold',
           },
           icon: {
-            path: mapsApi.SymbolPath.BACKWARD_CLOSED_ARROW,
+            path: mapsApi.SymbolPath.CIRCLE,
             scale: 5,
             fillColor: '#4CAF50',
             fillOpacity: 1,
@@ -167,8 +169,6 @@ export default function RoutePlanner() {
       
       
 
-
-
       const fetchPlacesAndDrawRoute = async () => {
         if (!mapsApi || !map || !currentLocation || selectedAmenities.length === 0) {
           alert("Please ensure you've selected amenities and set a current location.");
@@ -196,9 +196,9 @@ export default function RoutePlanner() {
           setDirectionsRenderer(renderer);
         }
       
-        let waypoints = [];
-        let placesDetails = []; // To store details of fetched places
+        let allPlaces = [];
       
+        // Gather all nearby amenities for each selected category
         for (const amenity of selectedAmenities) {
           const request = {
             location: currentLocation,
@@ -217,16 +217,34 @@ export default function RoutePlanner() {
             });
           });
       
-          // Assuming you take the first result as the desired place
-          if (results.length > 0) {
-            const placeResult = results[0];
-            placesDetails.push(placeResult);
+          allPlaces.push(...results);
+        }
+      
+        // Sort allPlaces by distance from the current location
+        allPlaces.sort((a, b) => {
+          const distA = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(a.geometry.location.lat(), a.geometry.location.lng()),
+            currentLocation
+          );
+          const distB = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(b.geometry.location.lat(), b.geometry.location.lng()),
+            currentLocation
+          );
+          return distA - distB;
+        });
+      
+        // Take the nearest places as waypoints, ensuring they're unique
+        let waypoints = [];
+        let placesDetails = [];
+        allPlaces.forEach(place => {
+          if (waypoints.length < selectedAmenities.length && !placesDetails.some(p => p.place_id === place.place_id)) {
             waypoints.push({
-              location: placeResult.geometry.location,
+              location: place.geometry.location,
               stopover: true,
             });
+            placesDetails.push(place);
           }
-        }
+        });
       
         if (waypoints.length > 0) {
           // Calculate the route through the waypoints
@@ -241,15 +259,10 @@ export default function RoutePlanner() {
           directionsService.route(routeRequest, (result, status) => {
             if (status === 'OK') {
               const totalDuration = result.routes[0].legs.reduce((sum, leg) => sum + leg.duration.value, 0);
-              if (totalDuration <= 1000) { 
+              if (totalDuration <= 900) { // 15 minutes in seconds
                 renderer.setDirections(result);
               } else {
-                const proceed = window.confirm("The total travel time for the selected route exceeds 15 minutes. Would you like to proceed anyway?");
-                if (proceed) {
-                  renderer.setDirections(result);
-                } else {
-                  // Handle the case where the user chooses not to proceed
-                }
+                alert("The total travel time for the selected route exceeds 15 minutes.");
               }
             } else {
               alert("We couldn't calculate the route. There may be no available paths for the selected travel mode.");
@@ -262,6 +275,7 @@ export default function RoutePlanner() {
           alert("No places found within the specified radius. Try selecting different amenities or increasing the search radius.");
         }
       };
+      
       
       
 
